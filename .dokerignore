@@ -1,0 +1,19 @@
+# Python
+__pycache__
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Git
+.git
+.gitignore
+
+# Other
+*.log
+*.sql
+*.sqlite
