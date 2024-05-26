@@ -8,7 +8,7 @@ class Item(BaseModel):
     description: str = None
     price: float
     tax: float = None
-
+# TEST COMMENT
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
