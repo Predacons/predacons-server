@@ -2,25 +2,14 @@ import json
 from typing import List, Optional
 from dataclasses import dataclass
 from predacons_model import PredaconsModel
+import predacons
+from chat_class import Message, Conversation, ContentFilterResults, Choice, PromptFilterResults, Usage, Response
 
-@dataclass
-class Message:
-    role: str
-    content: str
 
-@dataclass
-class Conversation:
-    messages: List[Message]
-    max_tokens: int
-    temperature: float
-    frequency_penalty: float
-    presence_penalty: float
-    top_p: float
-    stop: Optional[str]
 
-async def completions(conversation_body:str, model, api_version:str = None):
+async def completions(conversation_body:str, model_dict, api_version:str = None):
     print("Entry Chat Completions")
-    print(model)    
+    print(model_dict)    
     print(api_version)
     # print(conversation_body)
     
@@ -28,8 +17,34 @@ async def completions(conversation_body:str, model, api_version:str = None):
     conversation = Conversation(**conversation_body)
 
     print(conversation)
+    
 
+    model = model_dict.model_bin
+    tokenizer = model_dict.tokenizer
+    trust_remote_code = model_dict.trust_remote_code
+    fast_gen = model_dict.use_fast_generation
+    draft_model = model_dict.draft_model_name
+    print(model)
+    print(tokenizer)
 
+    # output,tokenizer = predacons.generate(model = model,
+    #     sequence = conversation.messages,
+    #     max_length = conversation.max_tokens,
+    #     tokenizer = tokenizer,
+    #     trust_remote_code = trust_remote_code)
+    #  response = tokenizer.decode(output[0], skip_special_tokens=True)
+    #  print(response)
+
+    response = "hello"
+    
+    chat = Choice(
+        content_filter_results = ContentFilterResults(filtered = False, severity = "low"),
+        finish_reason = "length",
+        index = 0,
+        logprobs = response,
+        message = Message(role = "system", content = response)
+    )
+    return chat
     return {
         "choices": [
             {
