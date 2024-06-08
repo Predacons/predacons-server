@@ -1,6 +1,7 @@
 import json
 from typing import List, Optional
 from dataclasses import dataclass
+from predacons_model import PredaconsModel
 
 @dataclass
 class Message:
@@ -17,7 +18,7 @@ class Conversation:
     top_p: float
     stop: Optional[str]
 
-def completions(conversation_body:str, model:str, api_version:str = None):
+async def completions(conversation_body:str, model, api_version:str = None):
     print("Entry Chat Completions")
     print(model)    
     print(api_version)
@@ -27,6 +28,7 @@ def completions(conversation_body:str, model:str, api_version:str = None):
     conversation = Conversation(**conversation_body)
 
     print(conversation)
+
 
     return {
         "choices": [
