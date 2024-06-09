@@ -27,15 +27,16 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
     print(model)
     print(tokenizer)
 
-    # output,tokenizer = predacons.generate(model = model,
-    #     sequence = conversation.messages,
-    #     max_length = conversation.max_tokens,
-    #     tokenizer = tokenizer,
-    #     trust_remote_code = trust_remote_code)
-    #  response = tokenizer.decode(output[0], skip_special_tokens=True)
-    #  print(response)
+    output,tokenizer = predacons.generate(model = model,
+        sequence = "how are you?",
+        max_length = conversation.max_tokens,
+        tokenizer = tokenizer,
+        trust_remote_code = trust_remote_code)
+    
+    response = tokenizer.decode(output[0], skip_special_tokens=True)
+    print(response)
 
-    response = "hello"
+    # response = "hello"
     
     chat = Choice(
         content_filter_results = ContentFilterResults(filtered = False, severity = "low"),
