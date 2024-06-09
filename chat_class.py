@@ -17,9 +17,16 @@ class Conversation:
     stop: Optional[str]
 
 @dataclass
-class ContentFilterResults:
+class FilterCategory:
     filtered: bool
     severity: str
+
+@dataclass
+class ContentFilterResults:
+    hate: FilterCategory
+    self_harm: FilterCategory
+    sexual: FilterCategory
+    violence: FilterCategory
 
 @dataclass
 class Choice:
@@ -41,7 +48,7 @@ class Usage:
     total_tokens: int
 
 @dataclass
-class Response:
+class ChatResponse:
     choices: List[Choice]
     created: int
     id: str
