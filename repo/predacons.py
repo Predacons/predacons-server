@@ -1,5 +1,5 @@
 import predacons
-from transformers import AutoTokenizer
+# from transformers import AutoTokenizer
 import os
 import time
 from predacons_model import PredaconsModel
@@ -41,7 +41,8 @@ async def load_model(model_name:str):
             draft_model_name=draft_model_name
         ) 
           
-        tokenizers = AutoTokenizer.from_pretrained(path)
+        # tokenizers = AutoTokenizer.from_pretrained(path)
+        tokenizers = predacons.load_tokenizer(path) #Updated
 
         # model = model_name + path
         # tokenizers = model_name + "tokenizer"
