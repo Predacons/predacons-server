@@ -1,5 +1,4 @@
 import predacons
-# from transformers import AutoTokenizer
 import os
 import time
 from predacons_model import PredaconsModel
