@@ -50,7 +50,7 @@ You can configure environment variables in the `env` directory. For example, you
 API_KEYS=your-api-key
 
 
-*License*
+### LICENSE
 
 This project is licensed under multiple licenses:
 
@@ -62,6 +62,6 @@ This project is licensed under multiple licenses:
 
 Please ensure you understand and comply with the license that applies to you.
 
-*Contributing*
+### CONTRIBUTIONS
 
 Contributions are welcome! Please open a pull request to submit changes.
