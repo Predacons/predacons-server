@@ -2,7 +2,7 @@
 
 ## About
 
-An OpenAI API-based server built on Predacons to host any Torch and Hugging Face LLM model.
+An openai api based server built on predacons to host any torch and hugging face llm model 
 
 ## Running Locally
 
@@ -10,45 +10,37 @@ To run the application locally, follow these steps:
 
 ### Prerequisites
 
-- Docker installed on your system
-- Docker Compose installed on your system
+* Docker installed on your system
+* Docker Compose installed on your system
 
 ### Steps
 
 1. Clone the repository:
+bash
+git clone (link unavailable)
 
-    ```bash
-    git clone https://github.com/Predacons/predacons-server.git
-    ```
+1. Change into the project directory:
 
-2. Change into the project directory:
+cd predacons-server
 
-    ```bash
-    cd predacons-server
-    ```
+1. Build the Docker image:
 
-3. Build the Docker image:
+docker-compose build
 
-    ```bash
-    docker-compose build
-    ```
+1. Start the containers:
 
-4. Start the containers:
+docker-compose up
 
-    ```bash
-    docker-compose up
-    ```
+1. Access the application at:
 
-5. Access the application at:
+http://localhost:8000
 
-    [http://localhost:8000](http://localhost:8000)
-
-### Environment Variables
+*Environment Variables*
 
 You can configure environment variables in the `env` directory. For example, you can add a `.env` file with the following contents:
 
-```env
 API_KEYS=your-api-key
+
 
 *License*
 
