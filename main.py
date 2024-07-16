@@ -94,3 +94,19 @@ async def chat_completions(request: Request,model:str ,api_version:str = Query(d
     print(model)
     print(api_version)
     return await ChatService.completions(body, predacons_models[model], api_version)
+
+@app.post("/deployments/{model}/nocontext-completions", dependencies=[Depends(get_api_key)])
+async def nocontext_completions_endpoint(request: Request, model:str, api_version:str = Query(default=None, alias="api-version")):
+    body = await request.json()
+    print("Entry NoContext Completions Endpoint")
+    print(model)
+    if model not in predacons_models:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Model {model} not found",
+        )
+    
+    print(body)
+    print(model)
+    print(api_version)
+    return await ChatService.nocontext_completions(body, predacons_models[model], api_version)

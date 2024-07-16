@@ -1,0 +1,18 @@
+predacons-server/
+├── .git/
+├── .github/
+├── env/
+├── repo/
+│ └── predacons.py
+├── service/
+│ └── chat.py
+├── .dockerignore
+├── .gitignore
+├── chat_class.py
+├── docker-compose.yaml
+├── Dockerfile
+├── LICENSE
+├── main.py
+├── predacons_model.py
+├── README.md
+└── requirements.txt
