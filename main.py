@@ -1,12 +1,11 @@
 from fastapi import FastAPI, Query, HTTPException, status, Security,Depends, Request
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 from fastapi.security import APIKeyHeader, APIKeyQuery
 from dotenv import load_dotenv
 from predacons_model import PredaconsModel
 import os
 import service.chat as ChatService
 import repo.predacons as PredaconsRepo
-import json
 
 load_dotenv()
 predacons_models = {}
@@ -81,33 +80,33 @@ class Item(BaseModel):
     usage: dict
 
 @app.post("/deployments/{model}/chat/completions", dependencies=[Depends(get_api_key)])
-async def chat_completions(request: Request, model: str, api_version: str = Query(default=None, alias="api-version")):
-    try:
-        body = await request.json()
-    except json.JSONDecodeError:
+async def chat_completions(request: Request,model:str ,api_version:str = Query(default=None, alias="api-version")):
+    body = await request.json()
+    print("Entry Chat Completions")
+    print(model)
+    if model not in predacons_models:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid JSON format",
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Model {model} not found",
         )
     
-    try:
-        if model not in predacons_models:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Model {model} not found",
-            )
-        
-        return await ChatService.completions(body, predacons_models[model], api_version)
-    except ValidationError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal Server Error",
-        )
+    print(body)
+    print(model)
+    print(api_version)
+    return await ChatService.completions(body, predacons_models[model], api_version)
 
-
+@app.post("/deployments/{model}/nocontext-completions", dependencies=[Depends(get_api_key)])
+async def nocontext_completions_endpoint(request: Request, model:str, api_version:str = Query(default=None, alias="api-version")):
+    body = await request.json()
+    print("Entry NoContext Completions Endpoint")
+    print(model)
+    if model not in predacons_models:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Model {model} not found",
+        )
+    
+    print(body)
+    print(model)
+    print(api_version)
+    return await ChatService.nocontext_completions(body, predacons_models[model], api_version)

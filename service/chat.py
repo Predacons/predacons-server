@@ -85,3 +85,73 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
         usage = Usage(completion_tokens = 1, prompt_tokens = 1, total_tokens = 1)
     )
     return chat_response
+
+async def nocontext_completions(conversation_body:str, model_dict, api_version:str = None):
+    print("Entry NoContext Completions")
+    print(model_dict)    
+    print(api_version)
+    system_fingerprint = os.getenv('system_fingerprint')
+    
+    current_message = conversation_body["messages"][-1]
+
+    conversation = Conversation(
+        messages=[Message(role=current_message["role"], content=current_message["content"])],
+        max_tokens=conversation_body["max_tokens"],
+        temperature=conversation_body["temperature"],
+        frequency_penalty=conversation_body["frequency_penalty"],
+        presence_penalty=conversation_body["presence_penalty"],
+        top_p=conversation_body["top_p"],
+        stop=conversation_body["stop"]
+    )
+
+    print(conversation)
+
+    message_str = current_message['role'] + " : " + current_message['content'] + "\n Assistant :"
+    print(message_str)
+
+    model = model_dict.model_bin
+    tokenizer = model_dict.tokenizer
+    trust_remote_code = model_dict.trust_remote_code
+    fast_gen = model_dict.use_fast_generation
+    draft_model = model_dict.draft_model_name
+    print(model)
+    print(tokenizer)
+
+    output,tokenizer = predacons.generate(model = model,
+        sequence = message_str,
+        max_length = conversation.max_tokens,
+        tokenizer = tokenizer,
+        trust_remote_code = trust_remote_code)
+    
+    response = tokenizer.decode(output[0], skip_special_tokens=True)
+    print(response)
+
+    filter_results = ContentFilterResults(
+            hate = FilterCategory(filtered = False, severity = "safe"),
+            self_harm = FilterCategory(filtered = False, severity = "safe"),
+            sexual = FilterCategory(filtered = False, severity = "safe"),
+            violence = FilterCategory(filtered = False, severity = "safe")
+        )
+    prompt_filter_results = PromptFilterResults(
+        prompt_index = 0,
+        content_filter_results = filter_results
+    )
+    choice = Choice(
+        content_filter_results = filter_results,
+        finish_reason = "length",
+        index = 0,
+        logprobs = None,
+        message = Message(role = "assistant", content = response)
+    )
+
+    chat_response = ChatResponse(
+        choices = [choice],
+        created =  int(time.time()),
+        id = await generate_cmpl_id(),
+        model = model_dict.model_name,
+        object = "chat.completion",
+        prompt_filter_results = [prompt_filter_results],
+        system_fingerprint = system_fingerprint,
+        usage = Usage(completion_tokens = 1, prompt_tokens = 1, total_tokens = 1)
+    )
+    return chat_response
