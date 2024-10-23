@@ -30,14 +30,7 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
     conversation = Conversation(**conversation_body)
 
     print(conversation)
-    # convert conversation.messages to a string
-    message_str = ""
-    for message in conversation.messages:
-        message_str += message['role'] + " : " + message['content'] + "\n"
-    message_str = message_str + "\n Assistant :"
-    print(message_str)
     
-
     model = model_dict.model_bin
     tokenizer = model_dict.tokenizer
     trust_remote_code = model_dict.trust_remote_code
@@ -46,16 +39,18 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
     print(model)
     print(tokenizer)
 
-    output,tokenizer = predacons.generate(model = model,
-        sequence = message_str,
-        max_length = conversation.max_tokens,
-        tokenizer = tokenizer,
-        trust_remote_code = trust_remote_code)
+    response = predacons.chat_generate(model = model,
+            sequence = conversation.messages,
+            max_length = conversation.max_tokens,
+            tokenizer = tokenizer,
+            trust_remote_code = trust_remote_code,
+            do_sample=True,   
+            temperature = conversation.temperature,
+            dont_print_output = True,
+            )
     
-    response = tokenizer.decode(output[0], skip_special_tokens=True)
     print(response)
 
-    # response = "hello"
     filter_results = ContentFilterResults(
             hate = FilterCategory(filtered = False, severity = "safe"),
             self_harm = FilterCategory(filtered = False, severity = "safe"),
