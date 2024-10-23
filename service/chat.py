@@ -150,3 +150,15 @@ async def nocontext_completions(conversation_body:str, model_dict, api_version:s
         usage = Usage(completion_tokens = 1, prompt_tokens = 1, total_tokens = 1)
     )
     return chat_response
+
+def embeddings(model_dict, api_version:str = None):
+    print("Entry Embeddings")
+    print(model_dict)    
+    print(api_version)
+    system_fingerprint = os.getenv('system_fingerprint')
+    model = model_dict.model_bin
+    tokenizer = model_dict.tokenizer
+    trust_remote_code = model_dict.trust_remote_code
+    
+    embeddings = model_dict.embeddings
+    return "Embeddings"
