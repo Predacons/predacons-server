@@ -72,7 +72,7 @@ async def chat_completions(request: Request,model:str ,api_version:str = Query(d
     print(api_version)
     return await ChatService.completions(body, predacons_models[model], api_version)
 
-@app.post("/deployments/{model}/nocontext-completions", dependencies=[Depends(get_api_key)])
+@app.post("/deployments/{model}/completions", dependencies=[Depends(get_api_key)])
 async def nocontext_completions_endpoint(request: Request, model:str, api_version:str = Query(default=None, alias="api-version")):
     body = await request.json()
     print("Entry NoContext Completions Endpoint")
