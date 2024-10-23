@@ -55,29 +55,6 @@ async def get_api_key(
         detail="Invalid or missing API Key",
     )
 
-class Item(BaseModel):
-    name: str
-    description: str = None
-    price: float
-    tax: float = None
-
-@app.get("/")
-async def read_root():
-    return {"Hello": "World"}
-
-@app.post("/items/")
-async def create_item(item: Item):
-    return item
-
-class Item(BaseModel):
-    choices: list
-    created: int
-    id: str 
-    model: str
-    object: str
-    prompt_filter_results: list
-    system_fingerprint: str
-    usage: dict
 
 @app.post("/deployments/{model}/chat/completions", dependencies=[Depends(get_api_key)])
 async def chat_completions(request: Request,model:str ,api_version:str = Query(default=None, alias="api-version")):
