@@ -9,6 +9,7 @@ import string
 import os
 import dotenv
 from chat_class import Message, Conversation, ContentFilterResults, Choice, PromptFilterResults, Usage, ChatResponse,FilterCategory
+from embedding_class import Embedding, Usage, EmbeddingResponse,EmbeddingInput
 
 dotenv.load_dotenv()
 
@@ -150,3 +151,24 @@ async def nocontext_completions(conversation_body:str, model_dict, api_version:s
         usage = Usage(completion_tokens = 1, prompt_tokens = 1, total_tokens = 1)
     )
     return chat_response
+
+async def embeddings(body, model_dict,model, api_version:str = None):
+    print("Entry Embeddings")
+    print(model_dict)    
+    print(api_version)
+
+    embedding_input = EmbeddingInput(**body)
+
+    embeddings_object = model_dict
+    embeddings = embeddings_object.get_embedding(embedding_input.input)
+    if type(embedding_input.input) == str:
+        embeddings = [embeddings]
+    # convert embeddings to list of Embedding objects
+    embeddings_list = []
+    for i, embedding in enumerate(embeddings):
+        embeddings_list.append(Embedding(object = "embedding", index = i, embedding = embedding))
+
+    usage = Usage(prompt_tokens = len(embeddings_list), total_tokens = len(embeddings_list))
+    embedding_response = EmbeddingResponse(object = "list", data = embeddings_list, model = model, usage = usage)
+    return embedding_response
+    

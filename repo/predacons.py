@@ -15,7 +15,10 @@ async def load_model(model_name:str):
         if path is None:
             print(f"{model_name}_path not found")
             return f"{model_name}_path not found"
-        
+        # check if model_name__embedding_model exist in env and is true
+        if os.getenv(model_name+"_embedding_model") == "true":
+            embedding_model = predacons.PredaconsEmbedding(path)
+            return embedding_model
         trust_remote_code = str2bool(os.getenv(model_name+"_trust_remote_code"))
         if trust_remote_code is None:
             print(f"{model_name}_trust_remote_code not found so setting to False")
