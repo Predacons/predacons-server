@@ -28,5 +28,7 @@ class EmbeddingInput:
 @dataclass
 class EmbeddingInput:
     input: str
-    user: str
-    input_type: str
+    user: str = None
+    input_type: str = None
+    model: str = None
+    encoding_format: str = None

@@ -9,7 +9,7 @@ import string
 import os
 import dotenv
 from chat_class import Message, Conversation, ContentFilterResults, Choice, PromptFilterResults, Usage, ChatResponse,FilterCategory
-from embedding_class import Embedding, Usage, EmbeddingResponse,EmbeddingInput
+from embedding_class import Embedding, Usage as embedding_usage, EmbeddingResponse,EmbeddingInput
 
 dotenv.load_dotenv()
 
@@ -22,7 +22,6 @@ async def generate_cmpl_id():
 
 async def completions(conversation_body:str, model_dict, api_version:str = None):
     print("Entry Chat Completions")
-    print(model_dict)    
     print(api_version)
     system_fingerprint = os.getenv('system_fingerprint')
     # print(conversation_body)
@@ -37,8 +36,6 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
     trust_remote_code = model_dict.trust_remote_code
     fast_gen = model_dict.use_fast_generation
     draft_model = model_dict.draft_model_name
-    print(model)
-    print(tokenizer)
 
     response = predacons.chat_generate(model = model,
             sequence = conversation.messages,
@@ -84,7 +81,6 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
 
 async def nocontext_completions(conversation_body:str, model_dict, api_version:str = None):
     print("Entry NoContext Completions")
-    print(model_dict)    
     print(api_version)
     system_fingerprint = os.getenv('system_fingerprint')
     
@@ -110,8 +106,6 @@ async def nocontext_completions(conversation_body:str, model_dict, api_version:s
     trust_remote_code = model_dict.trust_remote_code
     fast_gen = model_dict.use_fast_generation
     draft_model = model_dict.draft_model_name
-    print(model)
-    print(tokenizer)
 
     output,tokenizer = predacons.generate(model = model,
         sequence = message_str,
@@ -154,7 +148,6 @@ async def nocontext_completions(conversation_body:str, model_dict, api_version:s
 
 async def embeddings(body, model_dict,model, api_version:str = None):
     print("Entry Embeddings")
-    print(model_dict)    
     print(api_version)
 
     embedding_input = EmbeddingInput(**body)
@@ -168,7 +161,7 @@ async def embeddings(body, model_dict,model, api_version:str = None):
     for i, embedding in enumerate(embeddings):
         embeddings_list.append(Embedding(object = "embedding", index = i, embedding = embedding))
 
-    usage = Usage(prompt_tokens = len(embeddings_list), total_tokens = len(embeddings_list))
+    usage = embedding_usage(prompt_tokens = len(embeddings_list), total_tokens = len(embeddings_list))
     embedding_response = EmbeddingResponse(object = "list", data = embeddings_list, model = model, usage = usage)
     return embedding_response
     
