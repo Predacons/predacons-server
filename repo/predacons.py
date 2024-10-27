@@ -49,8 +49,6 @@ async def load_model(model_name:str):
         # model = model_name + path
         # tokenizers = model_name + "tokenizer"
         predacons_model = PredaconsModel(model_name, path, trust_remote_code, use_fast_generation, draft_model_name, model, tokenizers)
-        print(f"Model {model_name} loaded: {model}")
-        print(f"Tokenizer {model_name} loaded: {tokenizers}")
         end_time = time.time()
         print(f"Model {model_name} loaded successfully in {end_time - start_time} seconds.")
         return predacons_model

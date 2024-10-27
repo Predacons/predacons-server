@@ -27,7 +27,6 @@ async def startup_event():
     # Load models
     global predacons_models
     predacons_models = await PredaconsRepo.load_models()
-    print(predacons_models)
     # Load tokenizers
    
 
@@ -56,11 +55,10 @@ async def get_api_key(
     )
 
 
-@app.post("/deployments/{model}/chat/completions", dependencies=[Depends(get_api_key)])
+@app.post("/openai/deployments/{model}/chat/completions", dependencies=[Depends(get_api_key)])
 async def chat_completions(request: Request,model:str ,api_version:str = Query(default=None, alias="api-version")):
     body = await request.json()
     print("Entry Chat Completions")
-    print(model)
     if model not in predacons_models:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -68,15 +66,13 @@ async def chat_completions(request: Request,model:str ,api_version:str = Query(d
         )
     
     print(body)
-    print(model)
     print(api_version)
     return await ChatService.completions(body, predacons_models[model], api_version)
 
-@app.post("/deployments/{model}/completions", dependencies=[Depends(get_api_key)])
+@app.post("/openai/deployments/{model}/completions", dependencies=[Depends(get_api_key)])
 async def nocontext_completions_endpoint(request: Request, model:str, api_version:str = Query(default=None, alias="api-version")):
     body = await request.json()
     print("Entry NoContext Completions Endpoint")
-    print(model)
     if model not in predacons_models:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -88,11 +84,10 @@ async def nocontext_completions_endpoint(request: Request, model:str, api_versio
     print(api_version)
     return await ChatService.nocontext_completions(body, predacons_models[model], api_version)
 
-@app.post("/deployments/{model}/embeddings", dependencies=[Depends(get_api_key)])
+@app.post("/openai/deployments/{model}/embeddings", dependencies=[Depends(get_api_key)])
 async def embeddings_endpoint(request: Request,model:str, api_version:str = Query(default=None, alias="api-version")):
     body = await request.json()
     print("Entry Embeddings Endpoint")
-    print(model)
     if model not in predacons_models:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -9,12 +9,14 @@ class Message:
 @dataclass
 class Conversation:
     messages: List[Message]
-    max_tokens: int
-    temperature: float
-    frequency_penalty: float
-    presence_penalty: float
-    top_p: float
-    stop: Optional[str]
+    max_tokens: int = 500
+    temperature: float = 0.7
+    frequency_penalty: float = None
+    presence_penalty: float = None
+    top_p: float = None
+    stop: Optional[str] = None
+    model: Optional[str] = None
+    encoding_format: str = None
 
 @dataclass
 class FilterCategory:
