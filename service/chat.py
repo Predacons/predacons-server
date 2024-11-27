@@ -79,6 +79,77 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
     )
     return chat_response
 
+async def generate_cmpl_id():
+    prefix = 'cmpl-'
+    id_length = 22
+    id_chars = string.ascii_letters + string.digits
+    random_id = ''.join(random.choice(id_chars) for _ in range(id_length))
+    return prefix + random_id
+
+async def completions_stream(conversation_body: str, model_dict, api_version: str = None):
+    print("Entry Chat Completions Stream")
+    print(api_version)
+    system_fingerprint = os.getenv('system_fingerprint')
+    
+    conversation = Conversation(**conversation_body)
+    print(conversation)
+    
+    model = model_dict.model_bin
+    tokenizer = model_dict.tokenizer
+    trust_remote_code = model_dict.trust_remote_code
+    fast_gen = model_dict.use_fast_generation
+    draft_model = model_dict.draft_model_name
+
+    thread, stream = predacons.chat_generate(
+        model=model,
+        sequence=conversation.messages,
+        max_length=conversation.max_tokens,
+        tokenizer=tokenizer,
+        trust_remote_code=trust_remote_code,
+        do_sample=True,
+        temperature=conversation.temperature,
+        dont_print_output=True,
+        stream=True
+    )
+    
+    thread.start()
+    
+    for response in stream:
+        print(response)
+        filter_results = ContentFilterResults(
+            hate=FilterCategory(filtered=False, severity="safe"),
+            self_harm=FilterCategory(filtered=False, severity="safe"),
+            sexual=FilterCategory(filtered=False, severity="safe"),
+            violence=FilterCategory(filtered=False, severity="safe")
+        )
+        prompt_filter_results = PromptFilterResults(
+            prompt_index=0,
+            content_filter_results=filter_results
+        )
+        choice = Choice(
+            content_filter_results=filter_results,
+            finish_reason=None,
+            index=0,
+            logprobs=None,
+            message=Message(role="assistant", content=response)
+        )
+
+        chat_response = ChatResponse(
+            choices=[choice],
+            created=int(time.time()),
+            id=await generate_cmpl_id(),
+            model=model_dict.model_name,
+            object="chat.completion.chunk",
+            prompt_filter_results=[prompt_filter_results],
+            system_fingerprint=system_fingerprint,
+            usage=Usage(completion_tokens=1, prompt_tokens=1, total_tokens=1)
+        )
+        
+        chat_response_json = json.dumps(chat_response, default=lambda o: o.__dict__)
+        yield f"data: {chat_response_json}\n\n"
+
+    yield "data: [DONE]\n\n"
+    
 async def nocontext_completions(conversation_body:str, model_dict, api_version:str = None):
     print("Entry NoContext Completions")
     print(api_version)

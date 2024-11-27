@@ -18,6 +18,12 @@ class Conversation:
     model: Optional[str] = None
     encoding_format: str = None
 
+    def __init__(self, **kwargs):
+        valid_keys = {field.name for field in self.__dataclass_fields__.values()}
+        filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_keys}
+        for key, value in filtered_kwargs.items():
+            setattr(self, key, value)
+
 @dataclass
 class FilterCategory:
     filtered: bool
