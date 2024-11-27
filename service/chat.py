@@ -131,7 +131,7 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
             finish_reason=None,
             index=0,
             logprobs=None,
-            message=Message(role="assistant", content=response)
+            delta=Message(role="assistant", content=response)
         )
 
         chat_response = ChatResponse(
@@ -149,7 +149,7 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
         yield f"data: {chat_response_json}\n\n"
 
     yield "data: [DONE]\n\n"
-    
+
 async def nocontext_completions(conversation_body:str, model_dict, api_version:str = None):
     print("Entry NoContext Completions")
     print(api_version)

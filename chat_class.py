@@ -3,8 +3,8 @@ from typing import List, Optional
 
 @dataclass
 class Message:
-    role: str
-    content: str
+    role: Optional[str]
+    content: Optional[str]
 
 @dataclass
 class Conversation:
@@ -42,7 +42,8 @@ class Choice:
     finish_reason: str
     index: int
     logprobs: Optional[str]
-    message: Message
+    delta: Optional[Message] = None
+    message: Optional[Message] = None
 
 @dataclass
 class PromptFilterResults:
