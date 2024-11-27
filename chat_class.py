@@ -3,8 +3,8 @@ from typing import List, Optional
 
 @dataclass
 class Message:
-    role: str
-    content: str
+    role: Optional[str]
+    content: Optional[str]
 
 @dataclass
 class Conversation:
@@ -17,6 +17,12 @@ class Conversation:
     stop: Optional[str] = None
     model: Optional[str] = None
     encoding_format: str = None
+
+    def __init__(self, **kwargs):
+        valid_keys = {field.name for field in self.__dataclass_fields__.values()}
+        filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_keys}
+        for key, value in filtered_kwargs.items():
+            setattr(self, key, value)
 
 @dataclass
 class FilterCategory:
@@ -36,7 +42,8 @@ class Choice:
     finish_reason: str
     index: int
     logprobs: Optional[str]
-    message: Message
+    delta: Optional[Message] = None
+    message: Optional[Message] = None
 
 @dataclass
 class PromptFilterResults:

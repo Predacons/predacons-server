@@ -6,6 +6,7 @@ from predacons_model import PredaconsModel
 import os
 import service.chat as ChatService
 import repo.predacons as PredaconsRepo
+from fastapi.responses import StreamingResponse
 
 load_dotenv()
 predacons_models = {}
@@ -67,6 +68,8 @@ async def chat_completions(request: Request,model:str ,api_version:str = Query(d
     
     print(body)
     print(api_version)
+    if body.get("stream"):
+                return StreamingResponse(ChatService.completions_stream(body, predacons_models[model], api_version), media_type="text/event-stream")
     return await ChatService.completions(body, predacons_models[model], api_version)
 
 @app.post("/openai/deployments/{model}/completions", dependencies=[Depends(get_api_key)])
