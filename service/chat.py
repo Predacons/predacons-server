@@ -115,7 +115,6 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
     thread.start()
     
     for response in stream:
-        print(response)
         filter_results = ContentFilterResults(
             hate=FilterCategory(filtered=False, severity="safe"),
             self_harm=FilterCategory(filtered=False, severity="safe"),
