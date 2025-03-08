@@ -1,0 +1,23 @@
+API_KEYS=d45e483c-1ee2-4850-a25e-1fae2c35cb24
+system_fingerprint = f8f3g3a4
+model_list=model1,model2,model3,model4
+
+model1_path=Precacons/Pico-Lamma-3.2-1B-Reasoning-Instruct
+model1_trust_remote_code=true
+model1_use_fast_generation=False
+model1_draft_model_name = Precacons/Pico-Lamma-3.2-1B-Reasoning-Instruct
+
+# model2_path=Kwai-Kolors/Kolors
+# model2_trust_remote_code=true
+# model2_use_fast_generation=false
+# model2_draft_model_name = openai-community/gpt2
+
+model3_path=../models/model3.pkl
+model3_trust_remote_code=true
+model3_use_fast_generation=true
+model3_draft_model_name = model3
+
+model4_path=Snowflake/snowflake-arctic-embed-m-v1.5
+model4_trust_remote_code=true
+model4_use_fast_generation=false
+model4_embedding_model = true
