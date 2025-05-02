@@ -44,6 +44,8 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
     draft_model = model_dict.draft_model_name
 
     # Check if tools are present in the request and if tool_choice is 'auto' or has a specific function
+    if conversation.tool_choice is None:
+        conversation.tool_choice = 'auto'
     has_tools = conversation.tools is not None and len(conversation.tools) > 0
     use_tools = has_tools and (
         conversation.tool_choice in ['auto', 'any'] or 
@@ -61,7 +63,7 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
         The format is as follows:
         ```json
         {
-            tool_use:true,
+            "tool_use":true,
             "name": "tool_name",
             "arguments": {
 
@@ -228,6 +230,8 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
     fast_gen = model_dict.use_fast_generation
     draft_model = model_dict.draft_model_name
 
+    if conversation.tool_choice is None:
+        conversation.tool_choice = 'auto'
     # Check if tools are present in the request and if tool_choice is 'auto' or has a specific function
     has_tools = conversation.tools is not None and len(conversation.tools) > 0
     use_tools = has_tools and (
@@ -246,7 +250,7 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
         The format is as follows:
         ```json
         {
-            tool_use:true,
+            "tool_use":true,
             "name": "tool_name",
             "arguments": {
                 
@@ -355,7 +359,7 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
             ('{' in response_buffer and '}' in response_buffer)
         )
         
-        if tool_call_detected and response_buffer.endswith('}') or response_buffer.endswith('```'):
+        if tool_call_detected and (response_buffer.endswith('}') or response_buffer.endswith('```')):
             try:
                 # Try to extract JSON from the response
                 if "```json" in response_buffer:
