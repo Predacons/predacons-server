@@ -1,10 +1,41 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Dict, Any, Union
+
+@dataclass
+class FunctionParameters:
+    type: str
+    properties: Dict[str, Any]
+    required: List[str] = None
+
+@dataclass
+class FunctionDefinition:
+    name: str
+    description: str
+    parameters: FunctionParameters
+
+@dataclass
+class Tool:
+    type: str
+    function: FunctionDefinition
+
+@dataclass
+class ToolCall:
+    id: str
+    type: str
+    function: Dict[str, Any]
 
 @dataclass
 class Message:
     role: Optional[str]
-    content: Optional[str]
+    content: Optional[str] = None
+    tool_calls: Optional[List[ToolCall]] = None
+    tool_call_id: Optional[str] = None
+    name: Optional[str] = None
+
+@dataclass
+class ToolChoice:
+    type: str
+    function: Dict[str, str] = None
 
 @dataclass
 class Conversation:
@@ -17,6 +48,8 @@ class Conversation:
     stop: Optional[str] = None
     model: Optional[str] = None
     encoding_format: str = None
+    tools: Optional[List[Tool]] = None
+    tool_choice: Optional[Union[str, ToolChoice]] = None
 
     def __init__(self, **kwargs):
         valid_keys = {field.name for field in self.__dataclass_fields__.values()}
@@ -44,6 +77,7 @@ class Choice:
     logprobs: Optional[str]
     delta: Optional[Message] = None
     message: Optional[Message] = None
+    tool_calls: Optional[List[ToolCall]] = None
 
 @dataclass
 class PromptFilterResults:
