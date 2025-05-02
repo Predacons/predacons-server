@@ -56,17 +56,59 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
     # Craft a special instruction if tools are being used
     if has_tools and use_tools:
         # Create a system instruction that explains the tools
-        tool_instructions = "You have access to the following tools:\n"
+        tool_instructions = """You have access to some tools that can be called to get the answer. 
+        it is is up to up if you need to use the tool or not. But if you choose to use the tool make sure to respond in a very strict format.
+        The format is as follows:
+        ```json
+        {
+            tool_use:true,
+            "name": "tool_name",
+            "arguments": {
+
+            }
+        }
+        ```
+        You have access to the following tools:\n"""
         
         for tool in conversation.tools:
             if hasattr(tool, 'type') and tool.type == "function":
                 if hasattr(tool, 'function'):
                     func = tool.function
                     tool_instructions += f"- {func.name}: {func.description}\n"
+                    
+                    # Add parameters information if available
+                    if hasattr(func, 'parameters'):
+                        tool_instructions += f"  Parameters:\n"
+                        if hasattr(func.parameters, 'properties'):
+                            for param_name, param in func.parameters.properties.items():
+                                required = "Required" if hasattr(func.parameters, 'required') and param_name in func.parameters.required else "Optional"
+                                param_type = param.type if hasattr(param, 'type') else ""
+                                param_desc = param.description if hasattr(param, 'description') else ""
+                                tool_instructions += f"    - {param_name} ({param_type}): {param_desc} [{required}]\n"
+                                
+                                # Add enum values if available
+                                if hasattr(param, 'enum'):
+                                    enum_values = ", ".join([str(v) for v in param.enum])
+                                    tool_instructions += f"      Allowed values: [{enum_values}]\n"
             elif isinstance(tool, dict) and tool.get('type') == "function":
                 if 'function' in tool:
                     func = tool['function']
                     tool_instructions += f"- {func['name']}: {func['description']}\n"
+                    
+                    # Add parameters information if available
+                    if 'parameters' in func:
+                        tool_instructions += f"  Parameters:\n"
+                        if 'properties' in func['parameters']:
+                            for param_name, param in func['parameters']['properties'].items():
+                                required = "Required" if 'required' in func['parameters'] and param_name in func['parameters']['required'] else "Optional"
+                                param_type = param.get('type', "")
+                                param_desc = param.get('description', "")
+                                tool_instructions += f"    - {param_name} ({param_type}): {param_desc} [{required}]\n"
+                                
+                                # Add enum values if available
+                                if 'enum' in param:
+                                    enum_values = ", ".join([str(v) for v in param['enum']])
+                                    tool_instructions += f"      Allowed values: [{enum_values}]\n"
         
         # Add the tool instructions to the messages if there isn't already a system message
         has_system_message = any(
@@ -199,17 +241,59 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
     # Craft a special instruction if tools are being used
     if has_tools and use_tools:
         # Create a system instruction that explains the tools
-        tool_instructions = "You have access to the following tools:\n"
+        tool_instructions = """You have access to some tools that can be called to get the answer. 
+        it is is up to up if you need to use the tool or not. But if you choose to use the tool make sure to respond in a very strict format.
+        The format is as follows:
+        ```json
+        {
+            tool_use:true,
+            "name": "tool_name",
+            "arguments": {
+                
+            }
+        }
+        ```
+        You have access to the following tools:\n"""
         
         for tool in conversation.tools:
             if hasattr(tool, 'type') and tool.type == "function":
                 if hasattr(tool, 'function'):
                     func = tool.function
                     tool_instructions += f"- {func.name}: {func.description}\n"
+                    
+                    # Add parameters information if available
+                    if hasattr(func, 'parameters'):
+                        tool_instructions += f"  Parameters:\n"
+                        if hasattr(func.parameters, 'properties'):
+                            for param_name, param in func.parameters.properties.items():
+                                required = "Required" if hasattr(func.parameters, 'required') and param_name in func.parameters.required else "Optional"
+                                param_type = param.type if hasattr(param, 'type') else ""
+                                param_desc = param.description if hasattr(param, 'description') else ""
+                                tool_instructions += f"    - {param_name} ({param_type}): {param_desc} [{required}]\n"
+                                
+                                # Add enum values if available
+                                if hasattr(param, 'enum'):
+                                    enum_values = ", ".join([str(v) for v in param.enum])
+                                    tool_instructions += f"      Allowed values: [{enum_values}]\n"
             elif isinstance(tool, dict) and tool.get('type') == "function":
                 if 'function' in tool:
                     func = tool['function']
                     tool_instructions += f"- {func['name']}: {func['description']}\n"
+                    
+                    # Add parameters information if available
+                    if 'parameters' in func:
+                        tool_instructions += f"  Parameters:\n"
+                        if 'properties' in func['parameters']:
+                            for param_name, param in func['parameters']['properties'].items():
+                                required = "Required" if 'required' in func['parameters'] and param_name in func['parameters']['required'] else "Optional"
+                                param_type = param.get('type', "")
+                                param_desc = param.get('description', "")
+                                tool_instructions += f"    - {param_name} ({param_type}): {param_desc} [{required}]\n"
+                                
+                                # Add enum values if available
+                                if 'enum' in param:
+                                    enum_values = ", ".join([str(v) for v in param['enum']])
+                                    tool_instructions += f"      Allowed values: [{enum_values}]\n"
         
         # Add the tool instructions to the messages if there isn't already a system message
         has_system_message = any(
