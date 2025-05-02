@@ -166,3 +166,5 @@ repo/__pycache__/predacons.cpython-310.pyc
 /repo/__pycache__
 /service/__pycache__
 *.pyc
+/.vscode
+*.pyc
