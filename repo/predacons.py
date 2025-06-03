@@ -4,7 +4,9 @@ import time
 from predacons_model import PredaconsModel
 
 def str2bool(v):
-  return v.lower() in ("yes", "true", "t", "1")
+    if v is None:
+        return False
+    return v.lower() in ("yes", "true", "t", "1")
 
 async def load_model(model_name:str):
     try:
@@ -46,11 +48,10 @@ async def load_model(model_name:str):
         # Check if processor should be used
         use_processor = str2bool(os.getenv(model_name + "_use_processor"))
         processor = None
-        tokenizers = None
         if use_processor:
             processor = predacons.load_processor(path)
-        else:
-            tokenizers = predacons.load_tokenizer(path)
+        
+        tokenizers = predacons.load_tokenizer(path)
 
         predacons_model = PredaconsModel(
             model_name, path, trust_remote_code, use_fast_generation, draft_model_name, model, tokenizers, processor

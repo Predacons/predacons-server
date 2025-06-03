@@ -278,7 +278,7 @@ pkgutil-resolve-name=1.3.10=pyhd8ed1ab_2
 platformdirs=4.2.2=pyhd8ed1ab_0
 portalocker=2.10.1=pypi_0
 posthog=3.7.0=pypi_0
-predacons=0.0.128=pypi_0
+predacons=0.0.130
 predacons-agents=0.0.101=pypi_0
 predacons-cli=0.0.101=pypi_0
 predacons-gui=0.0.106=pypi_0
