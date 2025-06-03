@@ -38,7 +38,8 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
     print(conversation)
     
     model = model_dict.model_bin
-    tokenizer = model_dict.tokenizer
+    tokenizer = getattr(model_dict, 'tokenizer', None)
+    processor = getattr(model_dict, 'processor', None)
     trust_remote_code = model_dict.trust_remote_code
     fast_gen = model_dict.use_fast_generation
     draft_model = model_dict.draft_model_name
@@ -125,24 +126,37 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
                 if (hasattr(message, 'role') and message.role == "system") or (isinstance(message, dict) and message.get('role') == "system"):
                     # Handle both object and dict case
                     if hasattr(message, 'content'):
-                        conversation.messages[i].content = message.content + "\n\n" + tool_instructions
+                        if isinstance(message.content, str):
+                            conversation.messages[i].content = message.content + "\n\n" + tool_instructions
+                        elif isinstance(message.content, list):
+                            # Append as a new text block
+                            message.content.append({"type": "text", "text": tool_instructions})
                     elif isinstance(message, dict) and 'content' in message:
-                        message['content'] = message['content'] + "\n\n" + tool_instructions
+                        if isinstance(message['content'], str):
+                            message['content'] = message['content'] + "\n\n" + tool_instructions
+                        elif isinstance(message['content'], list):
+                            message['content'].append({"type": "text", "text": tool_instructions})
                     break
         else:
             # Add a new system message with tool instructions
             system_message = Message(role="system", content=tool_instructions)
             conversation.messages.insert(0, system_message)
-
-    response = predacons.chat_generate(model = model,
-            sequence = conversation.messages,
-            max_length = conversation.max_tokens,
-            tokenizer = tokenizer,
-            trust_remote_code = trust_remote_code,
-            do_sample=True,   
-            temperature = conversation.temperature,
-            dont_print_output = True,
-            )
+    if conversation.messages and (
+        (hasattr(conversation.messages[0], 'content') and isinstance(conversation.messages[0].content, str)) or
+        (isinstance(conversation.messages[0], dict) and isinstance(conversation.messages[0].get('content', None), str))
+    ):
+        processor = None
+    response = predacons.chat_generate(
+        model = model,
+        sequence = conversation.messages,
+        max_length = conversation.max_tokens,
+        tokenizer = tokenizer,
+        processor = processor,
+        trust_remote_code = trust_remote_code,
+        do_sample=True,   
+        temperature = conversation.temperature,
+        dont_print_output = True,
+    )
     
     print(response)
 
@@ -203,7 +217,7 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
         logprobs = None,
         message = Message(role="assistant", content=message_content, tool_calls=tool_calls)
     )
-
+    
     chat_response = ChatResponse(
         choices = [choice],
         created =  int(time.time()),
@@ -225,7 +239,8 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
     print(conversation)
     
     model = model_dict.model_bin
-    tokenizer = model_dict.tokenizer
+    tokenizer = getattr(model_dict, 'tokenizer', None)
+    processor = getattr(model_dict, 'processor', None)
     trust_remote_code = model_dict.trust_remote_code
     fast_gen = model_dict.use_fast_generation
     draft_model = model_dict.draft_model_name
@@ -312,20 +327,33 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
                 if (hasattr(message, 'role') and message.role == "system") or (isinstance(message, dict) and message.get('role') == "system"):
                     # Handle both object and dict case
                     if hasattr(message, 'content'):
-                        conversation.messages[i].content = message.content + "\n\n" + tool_instructions
+                        if isinstance(message.content, str):
+                            conversation.messages[i].content = message.content + "\n\n" + tool_instructions
+                        elif isinstance(message.content, list):
+                            # Append as a new text block
+                            message.content.append({"type": "text", "text": tool_instructions})
                     elif isinstance(message, dict) and 'content' in message:
-                        message['content'] = message['content'] + "\n\n" + tool_instructions
+                        if isinstance(message['content'], str):
+                            message['content'] = message['content'] + "\n\n" + tool_instructions
+                        elif isinstance(message['content'], list):
+                            message['content'].append({"type": "text", "text": tool_instructions})
                     break
         else:
             # Add a new system message with tool instructions
             system_message = Message(role="system", content=tool_instructions)
             conversation.messages.insert(0, system_message)
-
+            
+    if conversation.messages and (
+        (hasattr(conversation.messages[0], 'content') and isinstance(conversation.messages[0].content, str)) or
+        (isinstance(conversation.messages[0], dict) and isinstance(conversation.messages[0].get('content', None), str))
+    ):
+        processor = None
     thread, stream = predacons.chat_generate(
         model=model,
         sequence=conversation.messages,
         max_length=conversation.max_tokens,
         tokenizer=tokenizer,
+        processor=processor,
         trust_remote_code=trust_remote_code,
         do_sample=True,
         temperature=conversation.temperature,
@@ -464,18 +492,24 @@ async def nocontext_completions(conversation_body:str, model_dict, api_version:s
     print(message_str)
 
     model = model_dict.model_bin
-    tokenizer = model_dict.tokenizer
+    tokenizer = getattr(model_dict, 'tokenizer', None)
+    processor = getattr(model_dict, 'processor', None)
     trust_remote_code = model_dict.trust_remote_code
     fast_gen = model_dict.use_fast_generation
     draft_model = model_dict.draft_model_name
 
-    output,tokenizer = predacons.generate(model = model,
+    # Choose which to pass: tokenizer or processor
+    output, _ = predacons.generate(model = model,
         sequence = message_str,
         max_length = conversation.max_tokens,
         tokenizer = tokenizer,
+        # processor = processor,
         trust_remote_code = trust_remote_code)
-    
-    response = tokenizer.decode(output[0], skip_special_tokens=True)
+    # Use processor.decode if tokenizer is None
+    if tokenizer is not None:
+        response = tokenizer.decode(output[0], skip_special_tokens=True)
+    else:
+        response = processor.decode(output, skip_special_tokens=True)
     print(response)
 
     filter_results = ContentFilterResults(

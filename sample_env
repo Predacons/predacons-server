@@ -12,16 +12,16 @@ model1_use_processor = true
 # model2_trust_remote_code=true
 # model2_use_fast_generation=false
 # model2_draft_model_name = openai-community/gpt2
-model1_use_processor = false
+; model2_use_processor = false
 
 model3_path=../models/model3.pkl
 model3_trust_remote_code=true
 model3_use_fast_generation=true
 model3_draft_model_name = model3
-model1_use_processor = false
+model3_use_processor = false
 
 model4_path=Snowflake/snowflake-arctic-embed-m-v1.5
 model4_trust_remote_code=true
 model4_use_fast_generation=false
 model4_embedding_model = true
-model1_use_processor = false
+model4_use_processor = false
