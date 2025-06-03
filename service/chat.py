@@ -38,7 +38,8 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
     print(conversation)
     
     model = model_dict.model_bin
-    tokenizer = model_dict.tokenizer
+    tokenizer = getattr(model_dict, 'tokenizer', None)
+    processor = getattr(model_dict, 'processor', None)
     trust_remote_code = model_dict.trust_remote_code
     fast_gen = model_dict.use_fast_generation
     draft_model = model_dict.draft_model_name
@@ -134,15 +135,17 @@ async def completions(conversation_body:str, model_dict, api_version:str = None)
             system_message = Message(role="system", content=tool_instructions)
             conversation.messages.insert(0, system_message)
 
-    response = predacons.chat_generate(model = model,
-            sequence = conversation.messages,
-            max_length = conversation.max_tokens,
-            tokenizer = tokenizer,
-            trust_remote_code = trust_remote_code,
-            do_sample=True,   
-            temperature = conversation.temperature,
-            dont_print_output = True,
-            )
+    response = predacons.chat_generate(
+        model = model,
+        sequence = conversation.messages,
+        max_length = conversation.max_tokens,
+        tokenizer = tokenizer,
+        processor = processor,
+        trust_remote_code = trust_remote_code,
+        do_sample=True,   
+        temperature = conversation.temperature,
+        dont_print_output = True,
+    )
     
     print(response)
 
@@ -225,7 +228,8 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
     print(conversation)
     
     model = model_dict.model_bin
-    tokenizer = model_dict.tokenizer
+    tokenizer = getattr(model_dict, 'tokenizer', None)
+    processor = getattr(model_dict, 'processor', None)
     trust_remote_code = model_dict.trust_remote_code
     fast_gen = model_dict.use_fast_generation
     draft_model = model_dict.draft_model_name
@@ -326,6 +330,7 @@ async def completions_stream(conversation_body: str, model_dict, api_version: st
         sequence=conversation.messages,
         max_length=conversation.max_tokens,
         tokenizer=tokenizer,
+        processor=processor,
         trust_remote_code=trust_remote_code,
         do_sample=True,
         temperature=conversation.temperature,
@@ -464,18 +469,24 @@ async def nocontext_completions(conversation_body:str, model_dict, api_version:s
     print(message_str)
 
     model = model_dict.model_bin
-    tokenizer = model_dict.tokenizer
+    tokenizer = getattr(model_dict, 'tokenizer', None)
+    processor = getattr(model_dict, 'processor', None)
     trust_remote_code = model_dict.trust_remote_code
     fast_gen = model_dict.use_fast_generation
     draft_model = model_dict.draft_model_name
 
-    output,tokenizer = predacons.generate(model = model,
+    # Choose which to pass: tokenizer or processor
+    output, _ = predacons.generate(model = model,
         sequence = message_str,
         max_length = conversation.max_tokens,
         tokenizer = tokenizer,
+        processor = processor,
         trust_remote_code = trust_remote_code)
-    
-    response = tokenizer.decode(output[0], skip_special_tokens=True)
+    # Use processor.decode if tokenizer is None
+    if tokenizer is not None:
+        response = tokenizer.decode(output[0], skip_special_tokens=True)
+    else:
+        response = processor.decode(output, skip_special_tokens=True)
     print(response)
 
     filter_results = ContentFilterResults(

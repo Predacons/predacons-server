@@ -42,13 +42,19 @@ async def load_model(model_name:str):
             use_fast_generation=use_fast_generation,
             draft_model_name=draft_model_name
         ) 
-          
-        # tokenizers = AutoTokenizer.from_pretrained(path)
-        tokenizers = predacons.load_tokenizer(path) #Updated
+        
+        # Check if processor should be used
+        use_processor = str2bool(os.getenv(model_name + "_use_processor"))
+        processor = None
+        tokenizers = None
+        if use_processor:
+            processor = predacons.load_processor(path)
+        else:
+            tokenizers = predacons.load_tokenizer(path)
 
-        # model = model_name + path
-        # tokenizers = model_name + "tokenizer"
-        predacons_model = PredaconsModel(model_name, path, trust_remote_code, use_fast_generation, draft_model_name, model, tokenizers)
+        predacons_model = PredaconsModel(
+            model_name, path, trust_remote_code, use_fast_generation, draft_model_name, model, tokenizers, processor
+        )
         end_time = time.time()
         print(f"Model {model_name} loaded successfully in {end_time - start_time} seconds.")
         return predacons_model

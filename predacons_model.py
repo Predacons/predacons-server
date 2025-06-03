@@ -7,5 +7,6 @@ class PredaconsModel:
     trust_remote_code: bool
     use_fast_generation: bool
     draft_model_name: str
-    model_bin:any
-    tokenizer:any
+    model_bin: any
+    tokenizer: any = None
+    processor: any = None  # Added processor field, default None
